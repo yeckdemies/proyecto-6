@@ -84,5 +84,5 @@ npm install express mongoose dotenv
 
 - Ccarga de juego de datos en MongoDB, solo si es necesario.
 ```sh
-npm insertSeeds
+node src/utils/seeds/seeds.js
 ```
