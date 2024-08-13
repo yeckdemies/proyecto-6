@@ -1,3 +1,4 @@
+const Autor = require('../models/autores.model');
 const Libro = require('../models/libros.model');
 
 const getLibros = async (req, res, next) => {
@@ -12,7 +13,7 @@ const getLibros = async (req, res, next) => {
 const getLibrosById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const libro = await Libro.findById(id);
+    const libro = await Libro.findById(id).populate('autores');
     return res.status(200).json(libro);
   } catch (error) {
     return res.status(404).json({ message: error.message });
@@ -24,7 +25,7 @@ const getLibrosByTitulo = async (req, res, next) => {
     const { titulo } = req.params;
     const libros = await Libro.find({
       titulo: new RegExp(titulo, 'i') // 'i' es el flag para insensibilidad a mayúsculas y minúsculas
-    });
+    }).populate('autores');
     return res.status(200).json(libros);
   } catch (error) {
     return res.status(404).json({ message: error.message });
@@ -36,7 +37,7 @@ const getLibrosByGenero = async (req, res, next) => {
     const { genero } = req.params;
     const libros = await Libro.find({
       genero: new RegExp(genero, 'i') // 'i' es el flag para insensibilidad a mayúsculas y minúsculas
-    });
+    }).populate('autores');
     return res.status(200).json(libros);
   } catch (error) {
     return res.status(404).json({ message: error.message });
@@ -46,9 +47,12 @@ const getLibrosByGenero = async (req, res, next) => {
 const getLibrosByAutor = async (req, res, next) => {
   try {
     const { autor } = req.params;
-    const libros = await Libro.find({
-      autores: new RegExp(autor, 'i') // 'i' es el flag para insensibilidad a mayúsculas y minúsculas
+    const autorEncontrado = await Autor.findOne({
+      nombre: new RegExp(autor, 'i')
     });
+    const libros = await Libro.find({ autores: autorEncontrado._id }).populate(
+      'autores'
+    );
     return res.status(200).json(libros);
   } catch (error) {
     return res.status(404).json({ message: error.message });

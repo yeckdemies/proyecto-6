@@ -34,7 +34,9 @@ const getAutoresByNombre = async (req, res, next) => {
 const getAutoresByNacionalidad = async (req, res, next) => {
   try {
     const { nacionalidad } = req.params;
-    const autores = await Autor.find({ nacionalidad });
+    const autores = await Autor.find({
+      nacionalidad: new RegExp(nacionalidad, 'i') // 'i' es el flag para insensibilidad a mayúsculas y minúsculas
+    });
     return res.status(200).json(autores);
   } catch (error) {
     return res.status(404).json({ message: error.message });
