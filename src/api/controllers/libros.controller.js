@@ -61,7 +61,13 @@ const getLibrosByAutor = async (req, res, next) => {
 
 const postLibros = async (req, res, next) => {
   try {
-    const newLibro = new Libro(req.body);
+    const { autores } = req.body;
+    const autoresUnicos = [...new Set(autores)];
+    const newLibro = new Libro({
+      ...req.body,
+      autores: autoresUnicos
+    });
+
     const libroSaved = await newLibro.save();
     return res.status(201).json(libroSaved);
   } catch (error) {
@@ -75,9 +81,13 @@ const putLibros = async (req, res, next) => {
     const oldLibro = await Libro.findById(id);
     const newLibro = new Libro(req.body);
     newLibro._id = id;
+
     if (req.body.hasOwnProperty('autores')) {
-      newLibro.autores = [...oldLibro.autores, ...req.body.autores];
-    } else newLibro.autores = [...oldLibro.autores];
+      const combinedAutores = [...oldLibro.autores, ...req.body.autores];
+      newLibro.autores = Array.from(new Set(combinedAutores.map(String)));
+    } else {
+      newLibro.autores = [...oldLibro.autores];
+    }
     const libroUpdated = await Libro.findByIdAndUpdate(id, newLibro, {
       new: true
     });
